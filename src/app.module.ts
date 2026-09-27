@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppResolver } from './app.resolver.js';
 import { AppService } from './app.service.js';
 import { EventsModule } from './events/events.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { EventsModule } from './events/events.module.js';
     }),
 
     EventsModule,
+    UsersModule,
+    AuthModule,
   ],
 
   providers: [AppResolver, AppService],
