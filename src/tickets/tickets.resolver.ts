@@ -9,7 +9,6 @@ export class TicketsResolver {
     @Mutation(()=> Boolean )
     async createTickets(@Args('input') input: AddTicketsInput) {
         this.ticketsService.createMany(input);
-
         return true;
     }
 }
