@@ -1,5 +1,8 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 
+import type { Relation } from "typeorm";
+import { Ticket } from "../tickets/entities/ticket.entity.js";
+
 @ObjectType()
 export class EventDTO {
     @Field(type => Int)
@@ -34,6 +37,9 @@ export class EventDTO {
 
     @Field()
     status: string;
+
+    @Field(() => [Ticket], { nullable: true })
+    tickets?: Relation<Ticket[]>;
 }
 
 @InputType()

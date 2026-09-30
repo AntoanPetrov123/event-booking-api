@@ -9,6 +9,7 @@ import { AppService } from './app.service.js';
 import { EventsModule } from './events/events.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
+import { TicketsModule } from './tickets/tickets.module.js';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { UsersModule } from './users/users.module.js';
     EventsModule,
     UsersModule,
     AuthModule,
+    TicketsModule,
   ],
 
   providers: [AppResolver, AppService],

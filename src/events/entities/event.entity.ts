@@ -2,11 +2,15 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+
+import type { Relation } from "typeorm";
   
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Ticket } from '../../tickets/entities/ticket.entity.js';
   
 @ObjectType()
 @Entity('events')
@@ -62,4 +66,11 @@ export class Event {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field(() => [Ticket], { nullable: true })
+    @OneToMany(
+        () => Ticket,
+        (ticket) => ticket.event
+    )
+    tickets: Relation<Ticket[]>;
 }
