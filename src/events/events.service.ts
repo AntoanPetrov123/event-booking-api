@@ -33,7 +33,7 @@ export class EventsService {
   }
 
   async findAll(payload: GetEventsPayload) {
-    const { filter, pagination, search } = payload;
+    const { filter, pagination, search, listKey } = payload;
     const { city, hall, dateFrom, dateTo } = filter ?? {};
     const { page, sortBy, sortOrder, itemsPerPage } = pagination ?? {};
 
@@ -42,11 +42,11 @@ export class EventsService {
     query.andWhere('event.status = :status', { status: 'ACTIVE' });
 
     if (city) {
-      query.andWhere('event.city = :city', { city });
+      query.andWhere('event.city ILIKE :city', { city: `%${city}%` });
     }
 
     if (hall) {
-      query.andWhere('event.hall = :hall', { hall });
+      query.andWhere('event.hall = :hall', { hall: `%${hall}%` });
     }
 
     if (dateFrom) {
@@ -101,6 +101,7 @@ export class EventsService {
       page,
       itemsPerPage,
       totalPages: Math.ceil(total / itemsPerPage),
+      listKey,
     };
   }
 }

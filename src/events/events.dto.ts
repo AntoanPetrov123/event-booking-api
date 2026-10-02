@@ -115,6 +115,9 @@ export class GetEventsPayload {
 
     @Field(() => String, { nullable: true })
     search?: string;
+
+    @Field()
+    listKey?: string;
 }
 
 @ObjectType()
@@ -163,4 +166,7 @@ export class EventsDTO {
 
     @Field(type => Int)
     totalPages: number;
+
+    @Field()
+    listKey:string;
 }
