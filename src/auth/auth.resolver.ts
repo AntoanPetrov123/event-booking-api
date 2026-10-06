@@ -21,16 +21,12 @@ export class AuthResolver {
     async login(
         @Args('input', { type: () => LoginInput }) input: LoginInput
     ) {
-        console.log(input);
-        
         return this.authService.login(input);
     }
 
     @Query(() => User)
     @UseGuards(GqlAuthGuard)
     me(@CurrentUser() user: User) {
-        console.log(user);
-        
         return user;
     }
 }

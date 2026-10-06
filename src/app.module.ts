@@ -10,12 +10,16 @@ import { EventsModule } from './events/events.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { TicketsModule } from './tickets/tickets.module.js';
+import { PaymentsModule } from './payments/payments.module.js';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
+    ScheduleModule.forRoot(),
 
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -45,6 +49,7 @@ import { TicketsModule } from './tickets/tickets.module.js';
     UsersModule,
     AuthModule,
     TicketsModule,
+    PaymentsModule,
   ],
 
   providers: [AppResolver, AppService],

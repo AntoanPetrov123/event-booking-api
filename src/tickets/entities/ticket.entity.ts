@@ -55,6 +55,10 @@ export class Ticket {
   @Column({ default: 0 })
   usedPlaces: number;
 
+  @Field(() => Int)
+  @Column({ default: 0 })
+  reservedPlaces: number;
+
   @ManyToOne(
     () => Event,
     (event) => event.tickets,

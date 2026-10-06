@@ -40,3 +40,79 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date;
 }
+
+@Entity("user_orders")
+export class UserOrder {
+  @Field(() => ID)
+  @PrimaryGeneratedColumn('increment')
+  id: number;
+
+  @Column()
+  userId: number;
+
+  @Column()
+  status: string;
+
+  @Column()
+  paymentStatus: string;
+
+  @Column("decimal", {
+    precision: 10,
+    scale: 2,
+  })
+  totalAmount: number;
+
+  @Column({
+    default: "EUR",
+  })
+  currency: string;
+
+  @Column({ nullable: true })
+  stripeSessionId: string;
+
+  @Column({ nullable: true })
+  stripePaymentIntentId: string;
+
+  @CreateDateColumn()
+  expiresAt: Date;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+@Entity("user_order_items")
+export class UserOrderItem {
+  @Field(() => ID)
+  @PrimaryGeneratedColumn('increment')
+  id: number;
+
+  @Column()
+  orderId: number;
+
+  @Column()
+  ticketId: number;
+
+  @Column()
+  eventId: number;
+
+  @Column()
+  ticketName: string;
+
+  @Column()
+  quantity: number;
+
+  @Column("decimal", {
+    precision: 10,
+    scale: 2,
+  })
+  unitPrice: number;
+
+  @Column("decimal", {
+    precision: 10,
+    scale: 2,
+  })
+  totalPrice: number;
+}
