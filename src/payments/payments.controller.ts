@@ -14,8 +14,6 @@ export class PaymentsController {
     @Headers('stripe-signature')
     signature: string,
   ) {
-    console.log('IN THE WEBHOOK');
-    
     return this.paymentsService.handleWebhook(req.rawBody!, signature);
   }
 }

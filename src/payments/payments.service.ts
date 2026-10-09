@@ -451,4 +451,19 @@ export class PaymentsService {
       await this.cancelOrderAndReleaseReservation(order.id);
     }
   }
+
+  async getOrderByStripeSession(sessionId: string, userId: number) {
+    const order = await this.ordersRepository.findOne({
+      where: {
+        stripeSessionId: sessionId,
+        userId,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return order;
+  }
 }

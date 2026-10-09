@@ -1,5 +1,7 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Event } from "../../events/entities/event.entity.js";
+import type { Relation } from "typeorm";
 
 @ObjectType()
 @Entity()
@@ -41,6 +43,7 @@ export class User {
     updatedAt: Date;
 }
 
+@ObjectType()
 @Entity("user_orders")
 export class UserOrder {
   @Field(() => ID)
@@ -50,12 +53,15 @@ export class UserOrder {
   @Column()
   userId: number;
 
+  @Field()
   @Column()
   status: string;
 
+  @Field()
   @Column()
   paymentStatus: string;
 
+  @Field()
   @Column("decimal", {
     precision: 10,
     scale: 2,
@@ -83,36 +89,51 @@ export class UserOrder {
   updatedAt: Date;
 }
 
+@ObjectType()
 @Entity("user_order_items")
 export class UserOrderItem {
   @Field(() => ID)
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  @Field()
   @Column()
   orderId: number;
 
+  @Field()
   @Column()
   ticketId: number;
 
+  @Field()
   @Column()
   eventId: number;
 
+  @Field()
   @Column()
   ticketName: string;
 
+  @Field()
   @Column()
   quantity: number;
 
+  @Field()
   @Column("decimal", {
     precision: 10,
     scale: 2,
   })
   unitPrice: number;
 
+  @Field()
   @Column("decimal", {
     precision: 10,
     scale: 2,
   })
   totalPrice: number;
+
+  @Field(() => Event)
+  @ManyToOne(() => Event)
+  @JoinColumn({
+    name: "eventId",
+  })
+  event: Relation<Event>;
 }
