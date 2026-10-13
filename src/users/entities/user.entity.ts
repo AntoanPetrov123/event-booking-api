@@ -2,6 +2,7 @@ import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Event } from "../../events/entities/event.entity.js";
 import type { Relation } from "typeorm";
+import { UserRole } from "../../enums/user-role.js";
 
 @ObjectType()
 @Entity()
@@ -27,7 +28,7 @@ export class User {
     password: string;
 
     @Field()
-    @Column({ default: 'USER' })
+    @Column({ default: UserRole.USER })
     role: string;
 
     @Field()

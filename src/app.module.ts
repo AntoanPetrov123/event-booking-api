@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module.js';
 import { TicketsModule } from './tickets/tickets.module.js';
 import { PaymentsModule } from './payments/payments.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AdminModule } from './admin/admin.module.js';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AuthModule,
     TicketsModule,
     PaymentsModule,
+    AdminModule,
   ],
 
   providers: [AppResolver, AppService],
