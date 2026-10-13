@@ -2,7 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity.js';
-import { AddEventInput, GetEventsPayload } from './events.dto.js';
+import {
+  AddEventInput,
+  GetEventsPayload,
+  UpdateEventInput,
+} from './events.dto.js';
 
 @Injectable()
 export class EventsService {
@@ -24,12 +28,6 @@ export class EventsService {
     }
 
     return event;
-  }
-
-  async addEvent(input: AddEventInput) {
-    const event = this.eventsRepository.create(input);
-
-    return this.eventsRepository.save(event);
   }
 
   async findAll(payload: GetEventsPayload) {
@@ -103,5 +101,26 @@ export class EventsService {
       totalPages: Math.ceil(total / itemsPerPage),
       listKey,
     };
+  }
+
+  async addEvent(input: AddEventInput) {
+    const event = this.eventsRepository.create(input);
+
+    return this.eventsRepository.save(event);
+  }
+
+  async deleteEvent(eventId: number) {
+    const event = await this.findOneById(eventId);
+
+    return await this.eventsRepository.remove(event);
+  }
+
+  async updateEvent(event: UpdateEventInput) {
+    const { id, ...restData } = event;
+
+    const existingEvent = await this.findOneById(id);
+    Object.assign(existingEvent, restData);
+
+    return this.eventsRepository.save(existingEvent);
   }
 }

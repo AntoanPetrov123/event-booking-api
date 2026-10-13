@@ -5,6 +5,7 @@ import {
   AddEventInput,
   GetEventsPayload,
   EventsDTO,
+  UpdateEventInput,
 } from './events.dto.js';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard.js';
@@ -21,6 +22,14 @@ export class EventsResolver {
     return this.eventsService.findOneById(id);
   }
 
+  @Query(() => EventsDTO)
+  async getEvents(
+    @Args('payload', { type: () => GetEventsPayload })
+    payload: GetEventsPayload,
+  ) {
+    return await this.eventsService.findAll(payload);
+  }
+
   @UseGuards(GqlAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Mutation(() => Boolean)
@@ -30,11 +39,25 @@ export class EventsResolver {
     this.eventsService.addEvent(input);
 
     return true;
-    // return this.eventsService.findOneById(id);
   }
 
-  @Query(() => EventsDTO)
-  async getEvents(@Args('payload') payload: GetEventsPayload) {
-    return await this.eventsService.findAll(payload);
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => Boolean)
+  async updateEvent(
+    @Args('input', { type: () => UpdateEventInput }) input: UpdateEventInput,
+  ) {
+    await this.eventsService.updateEvent(input);
+
+    return true;
+  }
+
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => Boolean)
+  async deleteEvent(@Args('eventId', { type: () => Int }) eventId: number) {
+    await this.eventsService.deleteEvent(eventId);
+
+    return true;
   }
 }
