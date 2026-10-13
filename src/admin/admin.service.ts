@@ -24,4 +24,18 @@ export class AdminService {
 
     return this.usersRepository.save(user);
   }
+
+  async updateUserEmail(userId: number, email: string) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    user.email = email;
+
+    return this.usersRepository.save(user);
+  }
 }

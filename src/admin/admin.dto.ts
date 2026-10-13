@@ -9,3 +9,12 @@ export class UpdateUserRoleInput {
   @Field(() => UserRole)
   role: UserRole;
 }
+
+@InputType()
+export class UpdateUserEmailInput {
+  @Field(() => Int)
+  userId: number;
+
+  @Field()
+  email: string;
+}

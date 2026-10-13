@@ -19,6 +19,13 @@ import {
 } from '../users/entities/user.entity.js';
 import { DataSource } from 'typeorm';
 import { Cron } from '@nestjs/schedule';
+import {
+  IssuedTicket,
+  IssuedTicketStatus,
+} from '../tickets/entities/issued-ticket.entity.js';
+import { randomUUID } from 'crypto';
+import { QrService } from '../tickets/qr.service.js';
+import { MailService } from '../mail/mail.service.js';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -41,11 +48,14 @@ export class PaymentsService {
 
     @InjectRepository(Ticket)
     private readonly ticketsRepository: Repository<Ticket>,
-
     @InjectRepository(UserOrder)
     private readonly ordersRepository: Repository<UserOrder>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
 
     private readonly dataSource: DataSource,
+    private readonly qrService: QrService,
+    private readonly mailService: MailService,
   ) {
     this.stripe = new Stripe(
       this.configService.getOrThrow<string>('STRIPE_SECRET_KEY'),
@@ -363,18 +373,16 @@ export class PaymentsService {
       throw new BadRequestException('Missing orderId in Stripe metadata');
     }
 
-    await this.dataSource.transaction(async (manager) => {
+    const result = await this.dataSource.transaction(async (manager) => {
       const orderRepository = manager.getRepository(UserOrder);
-
       const orderItemsRepository = manager.getRepository(UserOrderItem);
-
       const ticketRepository = manager.getRepository(Ticket);
+      const issuedTicketRepository = manager.getRepository(IssuedTicket);
 
       const order = await orderRepository.findOne({
         where: {
           id: orderId,
         },
-
         lock: {
           mode: 'pessimistic_write',
         },
@@ -385,7 +393,11 @@ export class PaymentsService {
       }
 
       if (order.paymentStatus === PaymentStatus.PAID) {
-        return;
+        return {
+          order,
+          issuedTickets: [],
+          alreadyPaid: true,
+        };
       }
 
       const orderItems = await orderItemsRepository.find({
@@ -394,12 +406,13 @@ export class PaymentsService {
         },
       });
 
+      const issuedTickets: IssuedTicket[] = [];
+
       for (const item of orderItems) {
         const ticket = await ticketRepository.findOne({
           where: {
             id: item.ticketId,
           },
-
           lock: {
             mode: 'pessimistic_write',
           },
@@ -417,7 +430,25 @@ export class PaymentsService {
         ticket.usedPlaces += item.quantity;
 
         await ticketRepository.save(ticket);
+
+        for (let i = 0; i < item.quantity; i++) {
+          issuedTickets.push(
+            issuedTicketRepository.create({
+              userId: order.userId,
+              orderId: order.id,
+              orderItemId: item.id,
+              eventId: item.eventId,
+              ticketId: item.ticketId,
+              ticketName: item.ticketName,
+              code: randomUUID(),
+              status: IssuedTicketStatus.ACTIVE,
+            }),
+          );
+        }
       }
+
+      const savedIssuedTickets =
+        await issuedTicketRepository.save(issuedTickets);
 
       order.status = OrderStatus.COMPLETED;
 
@@ -428,7 +459,42 @@ export class PaymentsService {
       }
 
       await orderRepository.save(order);
+
+      return {
+        order,
+        issuedTickets: savedIssuedTickets,
+        alreadyPaid: false,
+      };
     });
+
+    if (result.alreadyPaid) {
+      return result;
+    }
+
+    const user = await this.usersRepository.findOne({
+      where: {
+        id: result.order.userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User ${result.order.userId} not found`);
+    }
+
+    try {
+      const ticketsWithQr = await Promise.all(
+        result.issuedTickets.map(async (ticket) => ({
+          ticket,
+          qrCode: await this.qrService.generateQrCode(ticket.code),
+        })),
+      );
+
+      await this.mailService.sendTickets(user.email, ticketsWithQr);
+    } catch (error) {
+      console.error('Failed to send ticket email:', error);
+    }
+
+    return result;
   }
 
   @Cron('*/1 * * * *')

@@ -6,10 +6,11 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { User, UserOrder } from '../users/entities/user.entity.js';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard.js';
 import { UseGuards } from '@nestjs/common';
+import { MailService } from '../mail/mail.service.js';
 
 @Resolver()
 export class PaymentsResolver {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(private readonly paymentsService: PaymentsService, private readonly mailService: MailService) {}
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => CheckoutSessionPayload)
