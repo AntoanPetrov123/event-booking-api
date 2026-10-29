@@ -5,7 +5,7 @@ import { Ticket } from '../tickets/entities/ticket.entity.js';
 
 @ObjectType()
 export class EventDTO {
-  @Field((type) => Int)
+  @Field(() => Int)
   id: number;
 
   @Field()
@@ -88,6 +88,9 @@ export class GetEventsFilter {
 
   @Field(() => String, { nullable: true })
   dateTo?: string;
+
+  @Field(() => String, { nullable: true })
+  status?: string;
 }
 
 @InputType()
@@ -122,7 +125,7 @@ export class GetEventsPayload {
 
 @ObjectType()
 export class ListEventDTO {
-  @Field((type) => Int)
+  @Field(() => Int)
   id: number;
 
   @Field()
@@ -148,23 +151,26 @@ export class ListEventDTO {
 
   @Field()
   image: string;
+
+  @Field(() => String, { nullable: true })
+  status: string;
 }
 
 @ObjectType()
 export class EventsDTO {
-  @Field((type) => [ListEventDTO], { nullable: true })
+  @Field(() => [ListEventDTO], { nullable: true })
   data?: ListEventDTO[];
 
-  @Field((type) => Int)
+  @Field(() => Int)
   total: number;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   page: number;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   itemsPerPage: number;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   totalPages: number;
 
   @Field()
@@ -173,6 +179,6 @@ export class EventsDTO {
 
 @InputType()
 export class UpdateEventInput extends AddEventInput {
-  @Field((type) => Int)
+  @Field(() => Int)
   id: number;
 }

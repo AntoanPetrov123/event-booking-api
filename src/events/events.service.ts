@@ -32,7 +32,7 @@ export class EventsService {
 
   async findAll(payload: GetEventsPayload) {
     const { filter, pagination, search, listKey } = payload;
-    const { city, hall, dateFrom, dateTo } = filter ?? {};
+    const { city, hall, dateFrom, dateTo, status } = filter ?? {};
     const { page, sortBy, sortOrder, itemsPerPage } = pagination ?? {};
 
     const query = this.eventsRepository.createQueryBuilder('event');
@@ -44,7 +44,13 @@ export class EventsService {
     }
 
     if (hall) {
-      query.andWhere('event.hall = :hall', { hall: `%${hall}%` });
+      query.andWhere('event.hall ILIKE :hall', { hall: `%${hall}%` });
+    }
+
+    if (status) {
+      query.andWhere('event.status = :status', {
+        status,
+      });
     }
 
     if (dateFrom) {
